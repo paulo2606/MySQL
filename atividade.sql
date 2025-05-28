@@ -42,5 +42,66 @@ select * from tb_vendas where quantidade = 0 or "Teste";
 select * from tb_vendas where status_venda = "Cancelada";
 delete from tb_vendas where status_venda = "Cancelada"; 
 
+#SELECT com cálculos
+
+#ex11 Relatório de Vendas Detalhado
+select 
+  nome_cliente as cliente,
+  categoria,
+  quantidade,
+  preco_unitario,
+  desconto,
+  taxa_imposto,
+  data_venda,
+  (quantidade * preco_unitario) as valor_bruto,
+  ((quantidade * preco_unitario) - desconto) as valor_com_desconto,
+  (((quantidade * preco_unitario) - desconto) * (taxa_imposto / 100)) as imposto_aplicado
+from tb_vendas 
+order by data_venda desc;
+
+#ex12 Total de vendas por Vendedor
+select 
+    vendedor,
+    sum(quantidade) as total_itens_vendidos,
+    sum(quantidade * preco_unitario) as valor_bruto_total,
+    sum(quantidade * preco_unitario - desconto) as valor_com_desconto,
+    sum(taxa_imposto) as imposto_total 
+from 
+    tb_vendas
+group by 
+    vendedor
+order by 
+    valor_bruto_total desc;
+    
+#ex13 Total de vendas por Categoria
+select 
+  categoria,
+  sum(quantidade) as quantidade_total_vendida,
+  sum(quantidade * preco_unitario) as valor_total_bruto,
+  sum((quantidade * preco_unitario) - desconto) as valor_total_com_desconto,
+  sum(((quantidade * preco_unitario) - desconto) * (taxa_imposto / 100)) as imposto_total_arrecadado
+from tb_vendas
+group by categoria;
+
+#ex14 Comparativo por Forma de Pagamento
+select 
+    forma_pagamento,
+    count(*) as total_vendas,
+    sum(quantidade * preco_unitario - desconto) as valor_com_desconto,
+    sum(taxa_imposto) as total_imposto
+from 
+    tb_vendas
+group by
+    forma_pagamento;
+
+#ex15 Evolução de Vendas por Mês e Ano
+select 
+  year(data_venda) as ano,
+  month(data_venda) as mes,
+  sum(quantidade * preco_unitario) as valor_bruto_total,
+  sum((quantidade * preco_unitario) - desconto) as valor_com_desconto_total
+from tb_vendas
+group by ano, mes
+order by ano asc, mes asc;
 
 
